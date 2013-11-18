@@ -24,6 +24,8 @@ The supported selectors are:
 - `:nth-last-of-type(N)`: Last Child N of Type Selector - Selects all elements that are the nth-child of their parent, counting from the last element to the first;
 - `:only-child`: Only Child Selector - Selects all elements that are the only child of their parent;
 - `:only-of-type`: Only Child of Type Selector - Selects all elements that have no siblings with the same element name;
+- `:first`: Last Element Selector - Selects the first matched element;
+- `:last`: Last Element Selector - Selects the last matched element;
 - `[attr="value"]`: Attribute Equals Selector - Selects elements that have the specified attribute with a value exactly equal to a certain value;
 - `[attr!="value"]`: Attribute Not Equal Selector - Select elements that either don’t have the specified attribute, or do have the specified attribute but not with a certain value;
 - `[attr|="value"]`: Attribute Contains Prefix Selector - Selects elements that have the specified attribute with a value either equal to a given string or starting with that string followed by a hyphen (-);
@@ -38,8 +40,6 @@ The supported selectors are:
 The next selectors to be implemented are:
 
 - `:eq(N)`: Index N Selector - Select the element at index n within the matched set;
-- `:first`: Last Element Selector - Selects the first matched element;
-- `:last`: Last Element Selector - Selects the last matched element;
 - `:odd`: Odd Elements Selector - Selects odd elements, zero-indexed. See also even;
 - `:even`: Even Elements Selector - Selects even elements, zero-indexed. See also odd;
 - `:lt`: Less Than Selector - Select all elements at an index less than index within the matched set;

@@ -146,6 +146,12 @@ function select(dom,q) {
 						pn = pn.par;
 					newObjs = [pn];
 				}
+				else if ( subsel == "first" ) {
+					newObjs = objs.length > 0 ? [objs[0]] : [];
+				}
+				else if ( subsel == "last" ) {
+					newObjs = objs.length > 0 ? [objs[objs.length-1]] : [];
+				}
 				else {
 					newObjs = queryFn(objs,null,function(el){
 						return _subSelMatch(el,subsel.toLowerCase(),subselNum,subselStr);
@@ -183,7 +189,7 @@ function select(dom,q) {
 		});
 	}
 	if ( !q.match(/^\s*$/) )
-		throw new Error("Can't understand selector '"+q+"'");
+		throw new Error("Can't understand selector "+JSON.stringify(q));
 
 	return _resBless(_uniqueNodes(objs));
 
