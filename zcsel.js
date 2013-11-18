@@ -76,7 +76,8 @@ function select(dom,q) {
 		objs = (dom instanceof Array) ? dom : [dom],
 		match = true,
 		hadSpace = true,
-		newObjs;
+		newObjs,
+		keepSubject = false;
 
 	if ( typeof(dom.par) == "undefined" )
 		initDom(dom,null);
@@ -89,9 +90,18 @@ function select(dom,q) {
 
 	// While have expression
 	while ( match ) {
+		if ( keepSubject ) {
+			newObjs = _subj_select(objs,q);
+			q = '';
+			break;
+		}
+
 		match = false;
-		q = q.replace(/^\s*([>+~]*)\s*(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*\])(\s*)/,function(a,sibsel,rule,sign,name,subsel,subselNum,subselStr,attr,attrOp,attrVal,space){
+		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*\])(\s*)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attr,attrOp,attrVal,space){
 			match = true;
+			if ( !keepSubject && subject )
+				keepSubject = true;
+
 			var
 				queryFn = hadSpace ?
 					(sibsel == ">") ? _childs :
@@ -172,8 +182,24 @@ function select(dom,q) {
 			return "";
 		});
 	}
+	if ( !q.match(/^\s*$/) )
+		throw new Error("Can't understand selector '"+q+"'");
 
 	return _resBless(_uniqueNodes(objs));
+
+}
+
+function _subj_select(objs,q) {
+
+	var
+		newObjs = [];
+
+	objs.forEach(function(o){
+		var ores = select(o,q);
+		if ( ores && ores.length > 0 )
+			newObjs.push(o);
+	});
+	return newObjs;
 
 }
 
