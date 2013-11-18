@@ -33,6 +33,7 @@ The supported selectors are:
 - `[attr$="value"]`: Attribute Ends With Selector - Selects elements that have the specified attribute with a value ending exactly with a given string. The comparison is case sensitive;
 - `:empty`: Empty Selector - Select all elements that have no children (including text nodes);
 - `:root`: Root Selector - Selects the element that is the root of the document;
+- `!`: Subject determiner - Determines what elements of the selection will be returned.
 
 The next selectors to be implemented are:
 
