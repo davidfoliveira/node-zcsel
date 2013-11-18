@@ -91,7 +91,7 @@ function select(dom,q) {
 	// While have expression
 	while ( match ) {
 		if ( keepSubject ) {
-			newObjs = _subj_select(objs,q);
+			objs = _subj_select(objs,q);
 			q = '';
 			break;
 		}
