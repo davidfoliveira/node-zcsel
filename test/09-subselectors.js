@@ -299,11 +299,31 @@ function test15(handler){
 		return handler(false,true);
 	});
 }
+function test16(handler){
+	parse('<body><div><p>Text</p><p>I have some text</p><p>I don\'t have :"(</p></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $('p:eq(3)');
+
+		if ( res.length != 1 ) {
+			console.log("Problem searching for Tag:eq(3). Expected 1 node and got "+res.length);
+			return handler(true,false);
+		}
+		if ( res.text() != "I don't have :\"(" ) {
+			console.log("Problem searching for Tag:eq(3). Found the wrong element. Expected to find 'I don't have :\"(' and found '"+res.text()+"'");
+			return handler(true,false);
+		}
+		console.log("Tag:eq(3): OK");
+		return handler(false,true);
+	});
+}
 
 
 // Run the tests
 
-series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14,test15],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14,test15,test16],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

@@ -152,6 +152,9 @@ function select(dom,q) {
 				else if ( subsel == "last" ) {
 					newObjs = objs.length > 0 ? [objs[objs.length-1]] : [];
 				}
+				else if ( subsel == "eq" && subselNum > 0 ) {
+					newObjs = objs.length > subselNum-1 ? [objs[subselNum-1]] : [];
+				}
 				else {
 					newObjs = queryFn(objs,null,function(el){
 						return _subSelMatch(el,subsel.toLowerCase(),subselNum,subselStr);
