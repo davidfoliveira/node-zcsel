@@ -30,10 +30,11 @@ function initDom(dom,par) {
 	$.children = godNode;
 
 	// Methods
-	$.find  = function(){return _resFind.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.html  = function(){return _resHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.text  = function(){return _resText.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.bless = function(){return _resBless.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.find		= function(){return _resFind.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.html		= function(){return _resHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.outerhtml	= function(){return _resOuterHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.text		= function(){return _resText.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.bless		= function(){return _resBless.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	return $;
 
 }
@@ -509,6 +510,7 @@ function _resBless(objs) {
 	objs.text = _resText;
 	objs.find = _resFind;
 	objs.html = _resHTML;
+	objs.outerhtml = _resOuterHTML;
 	objs.get = _resGet;
 	objs.tag = _resTag;
 	objs.attr = _resAttr;
@@ -557,6 +559,21 @@ function _elText(el,noChild) {
 		val += ent.decode(el.raw || el.data);
 
 	return val;
+
+}
+
+function _resOuterHTML() {
+
+	var
+		html = "";
+
+	// For all elements
+
+	this.forEach(function(el){
+		html += _elHTML(el);
+	});
+
+	return html;
 
 }
 

@@ -57,6 +57,18 @@ The next selectors to be implemented are:
 - `:header`: Headings Selector - Selects all elements that are headers, like h1, h2, h3 and so on;
 - `:image`: Image Selector - Selects all elements of type image;
 
+The supported methods are:
+
+- tag(): Return the element's tag name;
+- attr(attrName): Return the attribute `attrName` value;
+- each(): Iterates on the matched elements;
+- find(): Find descendent nodes;
+- prev(): Return the previous node;
+- next(): Return the next node;
+- text([noChilds]): Return the node's text. When noChilds optional argument is true, it's only returned the text of the current node, not child's text;
+- html(): Return the merged HTML of the elements;
+- outerhtml(): Return the merged outer HTML of the elements;
+
 
 # Installing
 
