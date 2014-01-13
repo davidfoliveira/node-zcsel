@@ -518,6 +518,7 @@ function _resBless(objs) {
 	objs.prev = _resPrev;
 	objs.next = _resNext;
 	objs.map = _resMap;
+	objs.val = function(){return this.attr("value")};
 
 	return objs;
 

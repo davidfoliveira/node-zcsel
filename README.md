@@ -68,6 +68,7 @@ The supported methods are:
 - text([noChilds]): Return the node's text. When noChilds optional argument is true, it's only returned the text of the current node, not child's text;
 - html(): Return the merged HTML of the elements;
 - outerhtml(): Return the merged outer HTML of the elements;
+- val(): The same as attr("value")
 
 
 # Installing
