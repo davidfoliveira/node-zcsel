@@ -290,8 +290,8 @@ function _adjSibRep(dom,nodes,filter) {
 
 	doms.forEach(function(dom){
 		var node = dom.nextSibling;
-		while ( node && (node.type == "text" || filter(node)) ) {
-			if ( node.type == "tag" )
+		while ( node && (node.type == "text" || node.type == "comment" || filter(node)) ) {
+			if ( node.type == "tag" || node.type == "script" )
 				nodes.push(node);
 			node = node.nextSibling;
 		}
