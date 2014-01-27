@@ -78,7 +78,8 @@ function select(dom,q) {
 		match = true,
 		hadSpace = true,
 		newObjs,
-		keepSubject = false;
+		keepSubject = false,
+		resultSet = [];
 
 	if ( typeof(dom.par) == "undefined" )
 		initDom(dom,null);
@@ -98,7 +99,7 @@ function select(dom,q) {
 		}
 
 		match = false;
-		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*\])(\s*)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attr,attrOp,attrVal,space){
+		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attr,attrOp,attrVal,space,comma){
 			match = true;
 			if ( !keepSubject && subject )
 				keepSubject = true;
@@ -187,7 +188,13 @@ function select(dom,q) {
 						return true;
 				});
 			}
-			objs = newObjs;
+			if ( comma ) {
+				resultSet = resultSet.concat(newObjs);
+				objs = (dom instanceof Array) ? dom : [dom];
+				space = " ";
+			}
+			else
+				objs = newObjs;
 			hadSpace = space ? true : false;
 			return "";
 		});
@@ -195,7 +202,8 @@ function select(dom,q) {
 	if ( !q.match(/^\s*$/) )
 		throw new Error("Can't understand selector "+JSON.stringify(q));
 
-	return _resBless(_uniqueNodes(objs));
+	resultSet = resultSet.concat(objs);
+	return _resBless(_uniqueNodes(resultSet));
 
 }
 
