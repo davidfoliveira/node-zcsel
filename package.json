@@ -2,7 +2,7 @@
   "author": "David Oliveira <d.oliveira@prozone.org>",
   "name": "zcsel",
   "description": "Zé CSS Selectors - A JQuery \"kind of\" CSS Selectors",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/davidfoliveira/node-zcsel"
