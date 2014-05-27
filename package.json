@@ -8,10 +8,10 @@
     "url": "https://github.com/davidfoliveira/node-zcsel"
   },
   "main": "./zcsel.js",
-  "bin": { },
+  "bin": {},
   "dependencies": {
-    "htmlparser": ">=1.7.6",
-    "ent": ">=0.1.0"
+    "he": ">=0.4.1",
+    "htmlparser": ">=1.7.6"
   },
   "devDependencies": {},
   "optionalDependencies": {},
