@@ -1,5 +1,5 @@
 var
-	ent = require('ent');
+	he = require('he');
 
 function initDom(dom,par) {
 
@@ -559,13 +559,13 @@ function _elText(el,noChild) {
 
 		el.children.forEach(function(o){
 			if ( o.type == 'text' && (o.raw || o.data) )
-				val += ent.decode(o.raw || o.data);
+				val += he.decode(o.raw || o.data);
 			else if ( o.type == 'tag' && !noChild )
 				val += _elText(o);
 		});
 	}
 	else if ( el.type == "text" && (el.raw || el.data) )
-		val += ent.decode(el.raw || el.data);
+		val += he.decode(el.raw || el.data);
 
 	return val;
 
@@ -612,7 +612,7 @@ function _elHTML(el){
 	if ( el.type == 'text' ) {
 		var str = (el.raw || '').replace(/[\r\n]+/g,"");
 		if ( str )
-			code += ent.decode(str)+"\n";
+			code += he.decode(str)+"\n";
 	}
 	else if ( el.type == 'tag' ) {
 		if ( !el.name.match(/^\s*(br|img|col|command|input|embed|hr|link|param|source)\s*$/i) ) {
@@ -656,7 +656,7 @@ function _resFind(q) {
 
 function _resAttr(attr) {
 
-	return this.length && this[0] && this[0].attribs && (this[0].attribs[attr] != null) ? ent.decode(this[0].attribs[attr]) : null;
+	return this.length && this[0] && this[0].attribs && (this[0].attribs[attr] != null) ? he.decode(this[0].attribs[attr]) : null;
 
 }
 
