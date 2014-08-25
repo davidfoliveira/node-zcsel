@@ -66,6 +66,7 @@ The supported methods are:
 - prev(): Return the previous node;
 - next(): Return the next node;
 - text([noChilds]): Return the node's text. When noChilds optional argument is true, it's only returned the text of the current node, not child's text;
+- code(): Same as text() but doesn't decode entities;
 - html(): Return the merged HTML of the elements;
 - outerhtml(): Return the merged outer HTML of the elements;
 - val(): The same as attr("value")
