@@ -34,6 +34,7 @@ function initDom(dom,par) {
 	$.html		= function(){return _resHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.outerhtml	= function(){return _resOuterHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.text		= function(){return _resText.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.code		= function(){return _resCode.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.bless		= function(){return _resBless.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	return $;
 
@@ -516,6 +517,7 @@ function _resBless(objs) {
 		objs = [objs];
 
 	objs.text = _resText;
+	objs.code = _resCode;
 	objs.find = _resFind;
 	objs.html = _resHTML;
 	objs.outerhtml = _resOuterHTML;
@@ -566,6 +568,44 @@ function _elText(el,noChild) {
 	}
 	else if ( el.type == "text" && (el.raw || el.data) )
 		val += he.decode(el.raw || el.data);
+
+	return val;
+
+}
+
+function _resCode(noChild) {
+
+	var
+		val = "";
+
+	// For all elements
+
+	this.forEach(function(el){
+		val += _elCode(el,noChild);
+	});
+
+	return val;
+
+}
+function _elCode(el,noChild) {
+
+	var
+		val = "";
+
+	// For all childs
+	if ( el.type == "tag" || el.type == "script" ) {
+		if ( el.children == null )
+			return "";
+
+		el.children.forEach(function(o){
+			if ( o.type == 'text' && (o.raw || o.data) )
+				val += (o.raw || o.data);
+			else if ( o.type == 'tag' && !noChild )
+				val += _elCode(o);
+		});
+	}
+	else if ( el.type == "text" && (el.raw || el.data) )
+		val += (el.raw || el.data);
 
 	return val;
 

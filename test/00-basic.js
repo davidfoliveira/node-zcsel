@@ -88,10 +88,39 @@ function test4(handler) {
 		return handler(false,true);
 	});
 }
+function test5(handler){
+	var html = "<html><head></head><body><h1>JS</h1><script>var k = 'David&#039;s bike';</script></body></html>";
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		if ( $("script").text() != "var k = 'David\'s bike';" ) {
+			console.log("Problem with text(). The final result is different from the source");
+			return handler(true,false);
+		}
+		console.log("text(): OK");
+		return handler(false,true);
+	});	
+}
+function test6(handler){
+	var html = "<html><head></head><body><h1>JS</h1><script>var k = 'David&#039;s bike';</script></body></html>";
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		if ( $("script").code() != "var k = 'David&#039;s bike';" ) {
+			console.log("Problem with code(). The final result is different from the source");
+			return handler(true,false);
+		}
+		console.log("code(): OK");
+		return handler(false,true);
+	});	
+}
 
 // Run the tests
-
-series([test1,test2,test3,test4],function(err,ran){
+series([test1,test2,test3,test4,test5,test6],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
