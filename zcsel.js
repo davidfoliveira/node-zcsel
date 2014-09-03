@@ -370,7 +370,7 @@ function _grep(dom,nodes,filter) {
 		nodes = [];
 
 	els.forEach(function(el){
-		if ( el.type != 'tag' )
+		if ( el.type != 'tag' && el.type != 'script' )
 			return;
 		if ( !filter || filter(el) )
 			nodes.push(el);
