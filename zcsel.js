@@ -527,6 +527,7 @@ function _resBless(objs) {
 	objs.each = _resEach;
 	objs.prev = _resPrev;
 	objs.next = _resNext;
+	objs.parent = _resParent;
 	objs.map = _resMap;
 	objs.val = function(){return this.attr("value")};
 
@@ -758,6 +759,20 @@ function _resNext() {
 	this.forEach(function(el){
 		if ( el.nextSibling )
 			objs.push(el.nextSibling);
+	});
+
+	return _resBless(objs);
+
+}
+
+function _resParent() {
+
+	var
+		objs = [];
+
+	this.forEach(function(el){
+		if ( el.par )
+			objs.push(el.par);
 	});
 
 	return _resBless(objs);

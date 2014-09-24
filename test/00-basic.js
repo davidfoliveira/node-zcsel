@@ -118,9 +118,24 @@ function test6(handler){
 		return handler(false,true);
 	});	
 }
+function test7(handler){
+	var html = "<html><head></head><body><h1><a href=\"#\">JS</a></h1></body></html>";
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		if ( $("h1 a").parent().tag() != "h1" ) {
+			console.log("Problem with parent(). The parent element is not h1, it is: ",$("h1 a").parent());
+			return handler(true,false);
+		}
+		console.log("parent(): OK");
+		return handler(false,true);
+	});	
+}
 
 // Run the tests
-series([test1,test2,test3,test4,test5,test6],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
