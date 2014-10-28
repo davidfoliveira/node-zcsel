@@ -50,7 +50,7 @@ function _initDomNode(node,par,id) {
 
 	if ( node.attribs ) {
 		if ( node.attribs['class'] )
-			node.classes = (node.attribs['class'] || '').toLowerCase().split(/ +/);
+			node.classes = (node.attribs['class'] || '').toLowerCase().split(/[\s\r\n]+/);
 	}
 
 	// Initialize children
