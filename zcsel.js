@@ -528,6 +528,7 @@ function _resBless(objs) {
 	objs.prev = _resPrev;
 	objs.next = _resNext;
 	objs.parent = _resParent;
+	objs.remove = _resRemove;
 	objs.map = _resMap;
 	objs.val = function(){return this.attr("value")};
 
@@ -778,6 +779,25 @@ function _resParent() {
 	return _resBless(objs);
 
 }
+
+function _resRemove() {
+
+	this.forEach(function(el){
+		if ( el.par ) {
+			var bros = el.par.children;
+			for ( var x = 0 ; x < bros.length ; x++ ) {
+				if ( bros[x]._id == el._id ) {
+					bros.splice(x,1);
+					break;
+				}
+			}
+		}
+	});
+
+	return this;
+
+}
+
 
 // Self object
 

@@ -88,10 +88,26 @@ function test4(handler){
 		return handler(false,true);
 	});
 }
+function test5(handler){
+	parse('<body><ul><li class=i>1</li><li class=i>2<ol class=o><li class=i>2.1</li><li class=i>2.2</li></ol></li><li class=i>3<ul class=u><li class=i>3.1</li></ul></li></ul></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		$('.o > li, .u > li').remove();
+		var res = $("li");
+		if ( res.length != 3 ) {
+			console.log("Problem searching for tags and classes. Expected 3 nodes and got "+res.length);
+			return handler(true,false);
+		}
+		console.log("Tags and Classes w/remove(): OK");
+		return handler(false,true);
+	});
+}
 
 // Run the tests
 
-series([test1,test2,test3,test4],function(err,ran){
+series([test1,test2,test3,test4,test5],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

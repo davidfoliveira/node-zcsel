@@ -59,14 +59,14 @@ function test2(handler) {
 	});
 }
 function test3(handler) {
-	parse('<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>',function(err,$){
+	parse('<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li><li>2<br>3</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>',function(err,$){
 		if ( err ) {
 			console.log("Error parsing HTML: ",err);
 			return;
 		}
 
-		if ( $.text() != "122.12.233.1" ) {
-			console.log("Problem getting text of all the document. Expected '122.12.233.1' and got '"+$.text()+"'");
+		if ( $.text() != "122.12.22333.1" ) {
+			console.log("Problem getting text of all the document. Expected '122.12.22333.1' and got '"+$.text()+"'");
 			return handler(true,false);
 		}
 		console.log("text(): OK");
@@ -133,9 +133,25 @@ function test7(handler){
 		return handler(false,true);
 	});	
 }
+function test8(handler) {
+	parse('<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li><li>2.3</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		$($.children[0].children[0].children[1].children[0].children[1].children[1].children[2]).remove();
+		if ( $.text() != "122.12.233.1" ) {
+			console.log("Problem getting text of all the document. Expected '122.12.22333.1' and got '"+$.text()+"'");
+			return handler(true,false);
+		}
+		console.log("remove(): OK");
+		return handler(false,true);
+	});
+}
 
 // Run the tests
-series([test1,test2,test3,test4,test5,test6,test7],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

@@ -71,6 +71,7 @@ The supported methods are:
 - html(): Return the merged HTML of the elements;
 - outerhtml(): Return the merged outer HTML of the elements;
 - val(): The same as attr("value")
+- remove(): Removes the matching elements from their parent elements
 
 
 # Installing
