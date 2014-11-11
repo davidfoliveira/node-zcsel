@@ -220,7 +220,7 @@ function test11(handler){
 	});
 }
 function test12(handler){
-	parse('<body><div><p>Text</p><img src="about:blank" title="Image 1"></div><div><img src="about:blank" title="Image 2"><p>Texto</p></div><div><p>Alone</p></div><div id="sad"></div></body>',function(err,$){
+	parse('<html><body><div><p>Text</p><img src="about:blank" title="Image 1"></div><div><img src="about:blank" title="Image 2"><p>Texto</p></div><div><p>Alone</p></div><div id="sad"></div></body></html>',function(err,$){
 		if ( err ) {
 			console.log("Error parsing HTML: ",err);
 			return;
@@ -231,7 +231,7 @@ function test12(handler){
 			console.log("Problem searching for :root. Expected 1 node and got "+res.length);
 			return handler(true,false);
 		}
-		if ( res.tag() != "body" ) {
+		if ( res.tag() != "html" ) {
 			console.log("Problem searching for :root. Found the wrong element. Expected to find 'body' and found '"+res.tag()+"'");
 			return handler(true,false);
 		}

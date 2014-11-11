@@ -25,6 +25,7 @@ The supported selectors are:
 - `:only-child`: Only Child Selector - Selects all elements that are the only child of their parent;
 - `:only-of-type`: Only Child of Type Selector - Selects all elements that have no siblings with the same element name;
 - `:eq(N)`: Index N Selector - Select the element at index n within the matched set;
+- `:contains("text")`: - Selects the elements containing the specified text on their inner text;
 - `:first`: Last Element Selector - Selects the first matched element;
 - `:last`: Last Element Selector - Selects the last matched element;
 - `[attr="value"]`: Attribute Equals Selector - Selects elements that have the specified attribute with a value exactly equal to a certain value;
@@ -70,8 +71,21 @@ The supported methods are:
 - code(): Same as text() but doesn't decode entities;
 - html(): Return the merged HTML of the elements;
 - outerhtml(): Return the merged outer HTML of the elements;
-- val(): The same as attr("value")
-- remove(): Removes the matching elements from their parent elements
+- val(): The same as attr("value");
+- append(node1,node2,...): Add the specified nodes to the end of the matching elements;
+- remove(): Removes the matching elements from their parent elements;
+- empty(): Removes all the child nodes on the matching elements;
+- replaceWith(node1,node2,...): Replace each one of the matching elements with the specified nodes;
+
+Parsing HTML:
+
+The $ variable [result of zcsel.initDom()] can be also used to parse HTML, converting it on DOM element instances. Example:
+
+	var titles = $("<h1>Something</h1><h2>Here</h2>");
+
+And then, can be used with DOM manipulation functions. Example:
+
+	$("div.title").replaceWith(titles);
 
 
 # Installing

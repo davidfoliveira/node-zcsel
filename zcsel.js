@@ -1,25 +1,25 @@
 var
-	he = require('he');
+	htmlparser	= require('htmlparser'),
+	he			= require('he');
 
 function initDom(dom,par) {
 
 	var
 		nodes = (dom instanceof Array) ? dom : [dom],
-		id = 0;
+		id = 1;
 
 	nodes.forEach(function(node){
-		_initDomNode(node,null,"R"+(++id));
+		_initDomNode(node,null,"R"+(id++));
 	});
 	nodes = _resBless(nodes);
 
 	// G0d node
-
 	var godNode = [{tag:'#G0D',name:'#G0D',type:'tag',_IAMGOD:true,children:nodes}];
 
 	// The d0llar
 	var $ = function(q){
 		if ( typeof q == "string" )
-			return $.find(q);
+			return q.match(/^[\s\r\n]*<(\w+|!--|!DOCTYPE)/i) ? $.build(q) : $.find(q);
 		else if ( typeof q == "function" )
 			return q.find ? q : $.find(q);
 		else if ( q instanceof Array || typeof q == "object" )
@@ -30,12 +30,18 @@ function initDom(dom,par) {
 	$.children = godNode;
 
 	// Methods
+	$.forEach	= function(cb){$.children.forEach(cb);};
+/*
 	$.find		= function(){return _resFind.apply(godNode,Array.prototype.slice.call(arguments,0))};
+	$.build		= function(){return _resBuild.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.html		= function(){return _resHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.outerhtml	= function(){return _resOuterHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.text		= function(){return _resText.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.code		= function(){return _resCode.apply(godNode,Array.prototype.slice.call(arguments,0))};
 	$.bless		= function(){return _resBless.apply(godNode,Array.prototype.slice.call(arguments,0))};
+*/
+	_resBless($,true);
+
 	return $;
 
 }
@@ -49,19 +55,18 @@ function _initDomNode(node,par,id) {
 	node._id = (id ? id : 0).toString();
 
 	if ( node.attribs ) {
-		if ( node.attribs['class'] )
+		if ( node.attribs['class'] && !node.classes )
 			node.classes = (node.attribs['class'] || '').toLowerCase().split(/[\s\r\n]+/);
 	}
 
 	// Initialize children
-
 	if ( node.children instanceof Array ) {
+		node._nextid = 1;
 		var
-			nextID = 0,
 			prev = null;
 
 		node.children.forEach(function(c){
-			_initDomNode(c,node,node._id+"."+(++nextID));
+			_initDomNode(c,node,node._id+"."+(node._nextid++));
 			if ( prev ) {
 				prev.nextSibling = c;
 				c.previousSibling = prev;
@@ -145,9 +150,14 @@ function select(dom,q) {
 					var pn = objs.length ? objs[0] : null;
 					if ( pn.children && pn.children.length > 0 )
 						pn = pn.children[0];
-					while ( pn && pn.par && !pn.par._IAMGOD )
-						pn = pn.par;
-					newObjs = [pn];
+					if ( pn._IAMGOD )
+						newObjs = pn.children;
+					else {
+						while ( pn && pn.par && !pn.par._IAMGOD ) {
+							pn = pn.par;
+						}
+						newObjs = [pn];
+					}
 				}
 				else if ( subsel == "first" ) {
 					newObjs = objs.length > 0 ? [objs[0]] : [];
@@ -510,30 +520,76 @@ function _subSelMatch(el,sel,num,str) {
 
 
 // Element methods
-
 function _resBless(objs) {
 
-	if ( !(objs instanceof Array) )
+	if ( !(objs instanceof Array) && typeof objs != "function" )
 		objs = [objs];
 
-	objs.text = _resText;
-	objs.code = _resCode;
-	objs.find = _resFind;
-	objs.html = _resHTML;
-	objs.outerhtml = _resOuterHTML;
-	objs.get = _resGet;
-	objs.tag = _resTag;
-	objs.attr = _resAttr;
-	objs.each = _resEach;
-	objs.prev = _resPrev;
-	objs.next = _resNext;
-	objs.parent = _resParent;
-	objs.remove = _resRemove;
-	objs.map = _resMap;
-	objs.val = function(){return this.attr("value")};
+	// Magic
+	objs.bless			= _resBless;
+
+	// Attributes
+	objs.text			= _resText;
+	objs.code			= _resCode;
+	objs.html			= _resHTML;
+	objs.outerhtml		= _resOuterHTML;
+	objs.attr			= _resAttr;
+	objs.tag			= _resTag;
+
+	// Querying and walking
+	objs.find			= _resFind;
+	objs.get			= _resGet;
+	objs.each			= _resEach;
+	objs.prev			= _resPrev;
+	objs.next			= _resNext;
+	objs.parent			= _resParent;
+	objs.map			= _resMap;
+
+	// Manipulation
+//	objs.after			= _resAfter;
+//	objs.before			= _resBefore;
+	objs.append			= _resAppend;
+//	objs.appendTo		= _resAppendTo;		(os targets são passados como argumento e os sources sao o set)
+//	objs.prepend		= _resPrepend;
+//	objs.prependTo		= _resPrependTo;	(os targets são passados como argumento e os sources sao o set)
+//	objs.insertAfter	= _resInsertAfter;
+//	objs.insertBefore	= _resInsertBefore;
+//	objs.clone			= _resClone;
+	objs.remove			= _resRemove;
+	objs.detach			= _resRemove;
+	objs.empty			= _resEmpty;
+	objs.replaceWith	= _resReplaceWith;
+//	objs.replaceAll		= _resReplaceAll;	(os targets são passados como argumento e os sources sao o set)
+	objs.build			= _resBuild;
+	objs.val			= function(){return this.attr("value")};
+	objs._zcrset		= true;
 
 	return objs;
 
+}
+
+function _resBuild(htmlCode) {
+
+	var
+		error,
+		els,
+		pHandler = new htmlparser.DefaultHandler(function(err,doc){
+			if ( err )
+				error = err;
+		});
+
+	parser = new htmlparser.Parser(pHandler);
+	parser.parseComplete(htmlCode);
+	els = error ? [] : pHandler.dom;
+
+	// Initialize and bless them
+	var id = 0;
+	els.forEach(function(node){
+		_initDomNode(node,null,"R"+(++id));
+	});
+	_resBless(els);
+
+	return els;
 }
 
 function _resText(noChild) {
@@ -634,7 +690,6 @@ function _resHTML() {
 		html = "";
 
 	// For all elements
-
 	this.forEach(function(el){
 		if ( el.children && el.children.length ) {
 			el.children.forEach(function(c){
@@ -669,6 +724,8 @@ function _elHTML(el){
 		else
 			code += "<"+el.data+">\n";
 	}
+	else if ( el.type == 'comment' )
+		code += '<!--'+el.data+'-->';
 
 	return code;
 
@@ -780,6 +837,8 @@ function _resParent() {
 
 }
 
+
+// Remove the matching set elements from their parents
 function _resRemove() {
 
 	this.forEach(function(el){
@@ -798,10 +857,176 @@ function _resRemove() {
 
 }
 
+// Remove all the childs elements from the matching set elements
+function _resEmpty() {
+
+	this.forEach(function(el){
+		el.children = [];
+	});
+
+}
+
+function _clone(o) {
+
+	if ( typeof o != "object" )
+		return o;
+
+    // Normal object
+    var
+        newObj = o.constructor();
+
+    for(var key in o) {
+    	if ( typeof o[key] == "object" && key != "par" && key != "prev" && key != "previousSibling" && key != "nextSibling" )
+	        newObj[key] = _clone(o[key]);
+	    else
+	    	newObj[key] = o[key];
+    }
+
+ 	return newObj;
+
+}
+
+// Add elements to the matching set (this)
+function _resAppend() {
+
+	var
+		addElems = _argElements(Array.prototype.slice.call(arguments));
+
+	this.forEach(function(el){
+		addElems.forEach(function(addElem){
+			_elementAdd(el,addElem,null);
+		});
+	});
+
+}
+
+function _argElements(args) {
+
+	var
+		retElems = [];
+
+	args.forEach(function(el){
+
+		if ( typeof el == "string" )
+			el = _resBuild(el);
+		else if ( typeof el == "function" ) {
+			el = el();
+			if ( el == null )
+				return;
+		}
+
+		// A DOM result set
+		if ( typeof el == "object" && el instanceof Array && el._zcrset ) {
+			el.forEach(function(subEl){
+				if ( subEl )
+					retElems.push(subEl);
+			});
+		}
+
+		// A DOM element
+		else if ( typeof el == "object" && el.type )
+			retElems.push(el);
+
+	});
+
+	return retElems;
+
+}
+
+function _elementAdd(target,source,idx) {
+
+	if ( !target || target.type != "tag" )
+		return;
+
+	if ( !target.children )
+		target.children = [];
+
+	if ( typeof idx != "number" )
+		idx = null;
+	if ( idx != null )
+		idx = parseInt(idx);
+	if ( idx == null || idx > target.children.length ) {
+		idx = target.children.length;
+		target.children.push(source);
+	}
+	else if ( idx < 0 ) {
+		idx = 0;
+		target.children.unshift(source);
+	}
+	else {
+		target.children.splice(idx,0,source);
+	}
+
+	// Source (and source children) should now have new id's, based on their parent id
+	if ( !target._nextid )
+		target._nextid = 1;
+	source.id = target._id+"."+(target._nextid++);
+	_initDomNode(source,target,source.id);
+
+}
+
+function _resReplaceWith(content) {
+
+	var
+		args	= Array.prototype.slice.call(arguments),
+		set		= this;
+
+	// Remove the new sets from their parents
+	args.forEach(function(contentEl){
+		// Already a set? Remove it from where it is
+		if ( typeof contentEl == "object" && contentEl instanceof Array && contentEl._zcrset )
+			contentEl.remove();
+	});
+
+	var
+		newElems = _argElements(args);
+
+	// Go on each parent of the elements of the set and locate for the nodes
+	set.forEach(function(el){
+		var addedEls = _elementsReplace(el,newElems);
+
+		if ( !el._nextid )
+			el._nextid = 1;
+		addedEls.forEach(function(addedEl){
+			addedEl.id = el.id+"."+(el._nextid++);
+			_initDomNode(addedEl,el,addedEl.id);
+		});
+	});
+
+	return this;
+
+}
+
+function _elementsReplace(el,addElements) {
+
+	var
+		_addElements = [],
+		bros;
+
+	if ( !el.par )
+		return [];
+
+	// Clone elements to add
+	addElements.forEach(function(addEl){
+		_addElements.push(_clone(addEl));
+	});
+
+	bros = el.par.children;
+	for ( var x = 0 ; x < bros.length ; x++ ) {
+		if ( bros[x]._id == el._id ) {
+			_addElements.splice(0,0,x,1);
+			bros.splice.apply(bros,_addElements);
+			return _addElements.splice(2,bros.length-2);
+		}
+	}
+
+	return _addElements;
+
+}
+
 
 // Self object
-
-exports.select = select;
-exports.initDom = initDom;
-exports.bless = _resBless;
-exports._initDomNode = _initDomNode;
+exports.select			= select;
+exports.initDom			= initDom;
+exports.bless			= _resBless;
+exports._initDomNode	= _initDomNode;
