@@ -19,7 +19,7 @@ function initDom(dom,par) {
 	// The d0llar
 	var $ = function(q){
 		if ( typeof q == "string" )
-			return q.match(/^[\s\r\n]*<(\w+|!--|!DOCTYPE)/i) ? $.build(q) : $.find(q);
+			return q.match(/^[\s\r\n]*<(\w+|!--|!DOCTYPE|\?)/i) ? $.build(q) : $.find(q);
 		else if ( typeof q == "function" )
 			return q.find ? q : $.find(q);
 		else if ( q instanceof Array || typeof q == "object" )
