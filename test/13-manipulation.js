@@ -28,7 +28,7 @@ function series(fns,handler){
 };
 
 function test1(handler){
-	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li class="takemefromhere">2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
+	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li class="2_1">2.1</li><li class="takemefromhere">2.2</li><li class="2_3">2.3</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
 	parse(html,function(err,$){
 		if ( err ) {
 			console.log("Error parsing HTML: ",err);
@@ -36,8 +36,12 @@ function test1(handler){
 		}
 
 		$(".takemefromhere").remove();
-		if ( $("body").text() != "122.133.1" ) {
+		if ( $("body").text() != "122.12.333.1" ) {
 			console.log("Problem with remove(). The final result is different from what was expected. Expecting a body.text()='122.133.1' and got '"+$("body").text()+"'");
+			return handler(true,false);
+		}
+		if ( $(".2_1").next().attr("class") != "2_3" ) {
+			console.log("Problem with remove(). The previous link of the removed object doesn't link with the next one");
 			return handler(true,false);
 		}
 		console.log("remove(): OK");
@@ -65,17 +69,25 @@ function test2(handler){
 }
 
 function test3(handler){
-	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
+	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li>Ba</li><li class="r">2.1</li><li class="r">2.2</li><li>s</li></ol><span>after</span></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
 	parse(html,function(err,$){
 		if ( err ) {
 			console.log("Error parsing HTML: ",err);
 			return;
 		}
 
-		$("ol li:first").remove();
-		$("ol li").replaceWith($("<li>Bata</li>"),$("<li>tas</li>"));
-		if ( $("ol").text() != "Batatas" ) {
-			console.log("Problem with replaceWith(). The final result is different from what was expected. Expecting a ol.text()='Batatas' and got '"+$("ol").text()+"'");
+		$("ol li.r").replaceWith($("<li id='ta1'>ta</li>"),$("<li id='ta2'>ta</li>"));
+		if ( $("ol").text() != "Batatatatas" ) {
+			console.log("Problem with replaceWith(). The final result is different from what was expected. Expecting a ol.text()='Batatatatas' and got '"+$("ol").text()+"'");
+			return handler(true,false);
+		}
+
+		if ( $("#ta1").prev().text() != "Ba" ) {
+			console.log("Problem with replaceWith(). The previous element was supposed to have 'Ba' as text as has '"+$("#ta1").prev().text()+"'");
+			return handler(true,false);
+		}
+		if ( $("#ta1").next().next().next().text() != "s" ) {
+			console.log("Problem with replaceWith(). The previous element was supposed to have 's' as text as has '"+$("#ta1").next().next().next().text()+"'");
 			return handler(true,false);
 		}
 		console.log("replaceWith(): OK");

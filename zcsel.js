@@ -846,6 +846,10 @@ function _resRemove() {
 			var bros = el.par.children;
 			for ( var x = 0 ; x < bros.length ; x++ ) {
 				if ( bros[x]._id == el._id ) {
+					if ( bros[x].previousSibling )
+						bros[x].previousSibling.nextSibling = bros[x].nextSibling;
+					if ( bros[x].nextSibling )
+						bros[x].nextSibling.previousSibling = bros[x].previousSibling;
 					bros.splice(x,1);
 					break;
 				}
@@ -1010,12 +1014,29 @@ function _elementsReplace(el,addElements) {
 	addElements.forEach(function(addEl){
 		_addElements.push(_clone(addEl));
 	});
+	if ( _addElements.length == 0 )
+		return [];
 
 	bros = el.par.children;
 	for ( var x = 0 ; x < bros.length ; x++ ) {
 		if ( bros[x]._id == el._id ) {
+			// Link elements between each other
+			for ( var le = 0 ; le < _addElements.length ; le++ ) {
+				if ( le > 0 )
+					_addElements[le].previousSibling = _addElements[le-1];
+				if ( _addElements.length > le+1 )
+					_addElements[le].nextSibling = _addElements[le+1];
+			}
+			// Link elements with their new brothers
+			if ( x > 0 )
+				_addElements[0].previousSibling = bros[x-1];
+			if ( bros.length > x+1 )
+				_addElements[_addElements.length-1].nextSibling = bros[x+1];
+
+			// Add
 			_addElements.splice(0,0,x,1);
 			bros.splice.apply(bros,_addElements);
+
 			return _addElements.splice(2,bros.length-2);
 		}
 	}
