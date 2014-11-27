@@ -1022,16 +1022,24 @@ function _elementsReplace(el,addElements) {
 		if ( bros[x]._id == el._id ) {
 			// Link elements between each other
 			for ( var le = 0 ; le < _addElements.length ; le++ ) {
-				if ( le > 0 )
+				if ( le > 0 ) {
 					_addElements[le].previousSibling = _addElements[le-1];
-				if ( _addElements.length > le+1 )
+					_addElements[le-1].nextSibling = _addElements[le];
+				}
+				if ( _addElements.length > le+1 ) {
 					_addElements[le].nextSibling = _addElements[le+1];
+					_addElements[le+1].previousSibling = _addElements[le];
+				}
 			}
 			// Link elements with their new brothers
-			if ( x > 0 )
+			if ( x > 0 ) {
 				_addElements[0].previousSibling = bros[x-1];
-			if ( bros.length > x+1 )
+				bros[x-1].nextSibling = _addElements[0];
+			}
+			if ( bros.length > x+1 ) {
 				_addElements[_addElements.length-1].nextSibling = bros[x+1];
+				bros[x+1].previousSibling = _addElements[_addElements.length-1];
+			}
 
 			// Add
 			_addElements.splice(0,0,x,1);

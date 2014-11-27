@@ -86,8 +86,8 @@ function test3(handler){
 			console.log("Problem with replaceWith(). The previous element was supposed to have 'Ba' as text as has '"+$("#ta1").prev().text()+"'");
 			return handler(true,false);
 		}
-		if ( $("#ta1").next().next().next().text() != "s" ) {
-			console.log("Problem with replaceWith(). The previous element was supposed to have 's' as text as has '"+$("#ta1").next().next().next().text()+"'");
+		if ( $("#ta1").next().next().next().next().text() != "s" ) {
+			console.log("Problem with replaceWith(). The previous next.next.next was supposed to have 's' as text as has '"+$("#ta1").next().next().next().next().text()+"'");
 			return handler(true,false);
 		}
 		console.log("replaceWith(): OK");
@@ -96,7 +96,7 @@ function test3(handler){
 }
 
 function test4(handler){
-	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
+	var html = '<html><head></head><body><h1>X</h1><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul><h2>Y</h2></body></html>';
 	parse(html,function(err,$){
 		if ( err ) {
 			console.log("Error parsing HTML: ",err);
@@ -104,8 +104,12 @@ function test4(handler){
 		}
 
 		$("body > ul").replaceWith($("<!-- TEST -->"));
-		if ( $("body").html() != "<!-- TEST -->" ) {
-			console.log("Problem with replaceWith(). The final result is different from what was expected. Expecting a ol.text()='<!-- TEST -->' and got '"+$("body").html()+"'");
+		if ( $("body").html().replace(/\s*\n\s*/g,"") != "<h1>X</h1><!-- TEST --><h2>Y</h2>" ) {
+			console.log("Problem with replaceWith(). The final result is different from what was expected. Expecting a ol.text()='<!-- TEST -->' and got '"+$("body").html().replace(/\s*\n\s*/g,"")+"'");
+			return handler(true,false);
+		}
+		if ( $("h1").next()[0].type != "comment" ) {
+			console.log("Problem with replaceWith(). Expecting to see a comment as next element of <h1> but got a "+$("h1").next()[0].type+": ",$("h1").next()[0].name);
 			return handler(true,false);
 		}
 		console.log("replaceWith(): OK");
