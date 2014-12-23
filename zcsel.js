@@ -753,9 +753,30 @@ function _resFind(q) {
 
 }
 
-function _resAttr(attr) {
+function _resAttr(attr,val) {
 
-	return this.length && this[0] && this[0].attribs && (this[0].attribs[attr] != null) ? he.decode(this[0].attribs[attr]) : null;
+	var
+		args = Array.prototype.slice.call(arguments);
+
+	if ( this.length == 0 || args.length == 0 )
+		return;
+
+	// Just getting
+	if ( args.length == 1 )
+		return this[0] && this[0].attribs && (this[0].attribs[attr] != null) ? he.decode(this[0].attribs[attr]) : null;
+
+	// Set
+	var res = this;
+	for ( var x = 0 ; x < this.length ; x++ ) {
+		if ( res[x].type != "tag" && res[x].type != "script" )
+			continue;
+		if ( !res[x].attribs )
+			res[x].attribs = {};
+		if ( val == null )
+			delete res[x].attribs[attr];
+		else
+			res[x].attribs[attr] = val;
+	}
 
 }
 

@@ -41,9 +41,14 @@ function test1(handler){
 			return handler(true,false);
 		}
 		if ( $(".2_1").next().attr("class") != "2_3" ) {
+			console.log("Problem with remove(). The next link of the removed object doesn't link with the previous one");
+			return handler(true,false);
+		}
+		if ( $(".2_3").prev().attr("class") != "2_1" ) {
 			console.log("Problem with remove(). The previous link of the removed object doesn't link with the next one");
 			return handler(true,false);
 		}
+
 		console.log("remove(): OK");
 		return handler(false,true);
 	});	
@@ -135,8 +140,33 @@ function test5(handler){
 	});	
 }
 
+function test6(handler){
+	var html = '<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>';
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		$("body").attr("x","y");
+		if ( $("body").attr("x") != "y" ) {
+			console.log("Problem with attr('x','y'). The attribute 'x' should have 'y' has value but has: '"+$("body").attr("x")+"'");
+			return handler(true,false);
+		}
+
+		$("body").attr("x",null);
+		if ( typeof $("body").attr("x") == "undefined" ) {
+			console.log("Problem with attr('x',null). The attribute 'x' should be undefined but is '"+typeof($("body").attr("x"))+"'");
+			return handler(true,false);
+		}
+
+		console.log("attr('x','y'): OK");
+		return handler(false,true);
+	});	
+}
+
 // Run the tests
-series([test1,test2,test3,test4,test5],function(err,ran){
+series([test1,test2,test3,test4,test5,test6],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
