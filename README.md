@@ -60,8 +60,9 @@ The next selectors to be implemented are:
 
 The supported methods are:
 
-- tag(): Return the element's tag name;
-- attr(attrName): Return the attribute `attrName` value;
+- tag([tagName]): Return the element's tag name or change it;
+- attr(attrName[,newValue]): Return the attribute `attrName` value or change it;
+- removeAttr(attrName): Remove the attribute named `attrName`; If attrName is omited, all the attributes are removed;
 - each(): Iterates on the matched elements;
 - find(): Find descendent nodes;
 - prev(): Return the previous node;

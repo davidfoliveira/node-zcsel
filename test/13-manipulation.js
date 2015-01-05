@@ -117,7 +117,7 @@ function test4(handler){
 			console.log("Problem with replaceWith(). Expecting to see a comment as next element of <h1> but got a "+$("h1").next()[0].type+": ",$("h1").next()[0].name);
 			return handler(true,false);
 		}
-		console.log("replaceWith(): OK");
+		console.log("replaceWith('<!-- COM -->'): OK");
 		return handler(false,true);
 	});	
 }
@@ -155,8 +155,8 @@ function test6(handler){
 		}
 
 		$("body").attr("x",null);
-		if ( typeof $("body").attr("x") == "undefined" ) {
-			console.log("Problem with attr('x',null). The attribute 'x' should be undefined but is '"+typeof($("body").attr("x"))+"'");
+		if ( typeof $("body").attr("x") != "undefined" ) {
+			console.log("Problem with attr('x',null). The attribute 'x' should be undefined but is '"+typeof($("body").attr("x"))+"' with value: ",$("body").attr("x"));
 			return handler(true,false);
 		}
 
@@ -165,8 +165,65 @@ function test6(handler){
 	});	
 }
 
+function test7(handler){
+	var html = '<html><head></head><body><a href="#stuff" target="x" class="link">link</a></body></html>';
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		$("body a").removeAttr("target");
+		if ( typeof $("body a").attr("target") != "undefined" ) {
+			console.log("Problem with removeAttr('target'). The attribute 'target' should not exist, but it exists and has this value: '"+$("body a").attr("target")+"'");
+			return handler(true,false);
+		}
+
+		console.log("removeAttr('x'): OK");
+		return handler(false,true);
+	});	
+}
+
+function test8(handler){
+	var html = '<html><head></head><body><a href="#stuff" target="x" class="link">link</a></body></html>';
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		$("body a").removeAttr();
+		if ( Object.keys($("body a")[0].attribs).length != 0 ) {
+			console.log("Problem with removeAttr(). The element still has attributes: ",$("body a")[0].attribs);
+			return handler(true,false);
+		}
+
+		console.log("removeAttr(): OK");
+		return handler(false,true);
+	});	
+}
+
+function test9(handler){
+	var html = '<html><head></head><body><a href="#stuff" target="x" class="link">link</a></body></html>';
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		$("body a").tag("span");
+		if ( $("body *").tag() != "span" ) {
+			console.log("Problem with tag('span'). The element should be now a 'span' and is a '"+$("body *").tag()+"'");
+			return handler(true,false);
+		}
+
+		console.log("tag('tag'): OK");
+		return handler(false,true);
+	});	
+}
+
 // Run the tests
-series([test1,test2,test3,test4,test5,test6],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
