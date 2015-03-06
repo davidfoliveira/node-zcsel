@@ -105,7 +105,7 @@ function select(dom,q) {
 		}
 
 		match = false;
-		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attr,attrOp,attrVal,space,comma){
+		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[((?:[\w\-]+\s*[\|\*\~\$\!\^=]*=\s*\"[^"]*\"\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attrsels,space,comma){
 			match = true;
 			if ( !keepSubject && subject )
 				keepSubject = true;
@@ -119,7 +119,7 @@ function select(dom,q) {
 					_allChilds : _grep;
 
 			if ( rule == "*" ) {
-				newObjs = _allChilds(objs);
+				newObjs = queryFn(objs);
 				checkUnique = true;
 			}
 			else if ( name ) {
@@ -174,30 +174,41 @@ function select(dom,q) {
 					});
 				}
 			}
-			else if ( attr && attrOp ) {
-				newObjs = queryFn(objs,null,function(el){
-					var val = (el.attribs ? el.attribs[attr] : null);
-					if ( val != null ) {
-						if ( attrOp == "=" || attrOp == "==" )
-							return (val == attrVal);
-						if ( attrOp == "!=" )
-							return (val != attrVal);
-						else if ( attrOp == "|=" )
-							return (val == attrVal || val.indexOf(attrVal+"-") == 0);
-						else if ( attrOp == "*=" )
-							return (val.indexOf(attrVal) > -1);
-						else if ( attrOp == "~=" ) {
-							attrVal = attrVal.replace(/^\s+|\s+$/g,"");
-							return (val == attrVal || val.substring(0,attrVal.length+1) == attrVal+" " || val.substring(val.length-attrVal.length-1,val.length) == " "+attrVal || val.indexOf(" "+attrVal+" ") > -1 );
-						}
-						else if ( attrOp == "$=" )
-							return (val == attrVal || val.substring(val.length-attrVal.length,val.length) == attrVal);
-						else if ( attrOp == "^=" )
-							return (val == attrVal || val.substring(0,attrVal.length) == attrVal);
-					}
-					else if ( attrOp == "!=" )
-						return true;
-				});
+			else if ( attrsels ) {
+				var ssmatch = true;
+				newObjs = objs;
+				while ( ssmatch ) {
+					ssmatch = false;
+					attrsels = attrsels.replace(/^\s*([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*/g,function(all,attr,attrOp,attrVal){
+						ssmatch = true;
+						newObjs = queryFn(newObjs,null,function(el){
+							var val = (el.attribs ? el.attribs[attr] : null);
+							if ( val != null ) {
+								if ( attrOp == "=" || attrOp == "==" )
+									return (val == attrVal);
+								if ( attrOp == "!=" )
+									return (val != attrVal);
+								else if ( attrOp == "|=" )
+									return (val == attrVal || val.indexOf(attrVal+"-") == 0);
+								else if ( attrOp == "*=" )
+									return (val.indexOf(attrVal) > -1);
+								else if ( attrOp == "~=" ) {
+									attrVal = attrVal.replace(/^\s+|\s+$/g,"");
+									return (val == attrVal || val.substring(0,attrVal.length+1) == attrVal+" " || val.substring(val.length-attrVal.length-1,val.length) == " "+attrVal || val.indexOf(" "+attrVal+" ") > -1 );
+								}
+								else if ( attrOp == "$=" )
+									return (val == attrVal || val.substring(val.length-attrVal.length,val.length) == attrVal);
+								else if ( attrOp == "^=" )
+									return (val == attrVal || val.substring(0,attrVal.length) == attrVal);
+							}
+							else if ( attrOp == "!=" )
+								return true;
+						});
+						return "";
+					});
+				}
+				if ( !attrsels.match(/^\s*$/) )
+					throw new Error("Can't understand selector ["+attrsels+"]");
 			}
 			if ( comma ) {
 				resultSet = resultSet.concat(newObjs);

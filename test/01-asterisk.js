@@ -38,7 +38,7 @@ function test1(handler){
 			console.log("Problem searching for asterisk. Expected 12 nodes and got "+res.length);
 			return handler(true,false);
 		}
-		console.log("Asterisk: OK");
+		console.log("*: OK");
 		return handler(false,true);
 	});	
 }
@@ -55,14 +55,31 @@ function test2(handler) {
 			console.log("Problem searching for asterisk with tag. Expected 2 nodes and got "+res.length);
 			return handler(true,false);
 		}
-		console.log("Asterisk with tag: OK");
+		console.log("tag *: OK");
+		return handler(false,true);
+	});
+}
+
+function test3(handler) {
+	parse('<html><head></head><body><ul><li>1</li><li>2<ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body></html>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $('body > ul > *');
+
+		if ( res.length != 3 ) {
+			console.log("Problem searching for > asterisk. Expected 3 nodes and got "+res.length);
+			return handler(true,false);
+		}
+		console.log("> *: OK");
 		return handler(false,true);
 	});
 }
 
 // Run the tests
 
-series([test1,test2],function(err,ran){
+series([test1,test2,test3],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
