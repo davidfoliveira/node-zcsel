@@ -105,7 +105,7 @@ function select(dom,q) {
 		}
 
 		match = false;
-		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[((?:[\w\-]+\s*[\|\*\~\$\!\^=]*=\s*\"[^"]*\"\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attrsels,space,comma){
+		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[((?:[\w\-]+\s*(?:[\|\*\~\$\!\^=]*=\s*\"[^"]*\")?\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attrsels,space,comma){
 			match = true;
 			if ( !keepSubject && subject )
 				keepSubject = true;
@@ -179,11 +179,13 @@ function select(dom,q) {
 				newObjs = objs;
 				while ( ssmatch ) {
 					ssmatch = false;
-					attrsels = attrsels.replace(/^\s*([\w\-]+)\s*([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\"\s*/g,function(all,attr,attrOp,attrVal){
+					attrsels = attrsels.replace(/^\s*([\w\-]+)\s*(?:([\|\*\~\$\!\^=]*=)\s*\"([^"]*)\")?\s*/g,function(all,attr,attrOp,attrVal){
 						ssmatch = true;
 						newObjs = queryFn(newObjs,null,function(el){
 							var val = (el.attribs ? el.attribs[attr] : null);
 							if ( val != null ) {
+                                if (!attrOp)
+                                    return val !== null;
 								if ( attrOp == "=" || attrOp == "==" )
 									return (val == attrVal);
 								if ( attrOp == "!=" )

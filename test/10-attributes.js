@@ -172,10 +172,27 @@ function test8(handler){
 	});
 }
 
+function test9(handler){
+	parse('<body><ul><li><img src="http://img-9gag-ftw.9cache.com/photo/a7ywb9b_460s.jpg" class="dog"></li><li><img src="https://igcdn-photos-f-a.akamaihd.net/hphotos-ak-xfa1/t51.2885-15/11008115_506562622818373_1918076377_n.jpg" class="cat"></li><li><img src="http://img-9gag-ftw.9cache.com/photo/aNeb3Zw_700b.jpg" class="bunny" disabled></li></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $('img[disabled]');
+
+		if ( res.attr("class") != "bunny" ) {
+			console.log("Problem searching for elem[attr]. Expected to get the element with class=\"bunny\" and got class=\""+res.attr("class")+"\"");
+			return handler(true,false);
+		}
+		console.log("elem[attr]: OK");
+		return handler(false,true);
+	});
+}
+
 
 // Run the tests
 
-series([test1,test2,test3,test4,test5,test6,test7,test8],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
