@@ -28,6 +28,7 @@ The supported selectors are:
 - `:contains("text")`: - Selects the elements containing the specified text on their inner text;
 - `:first`: Last Element Selector - Selects the first matched element;
 - `:last`: Last Element Selector - Selects the last matched element;
+- `[attr]`: Attribute Selector - Selects elements that have the specified attribute, regardless of its value;
 - `[attr="value"]`: Attribute Equals Selector - Selects elements that have the specified attribute with a value exactly equal to a certain value;
 - `[attr!="value"]`: Attribute Not Equal Selector - Select elements that either don’t have the specified attribute, or do have the specified attribute but not with a certain value;
 - `[attr|="value"]`: Attribute Contains Prefix Selector - Selects elements that have the specified attribute with a value either equal to a given string or starting with that string followed by a hyphen (-);
