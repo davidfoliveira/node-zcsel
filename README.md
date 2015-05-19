@@ -119,4 +119,4 @@ Make some code like this:
 
 # Dependences
 
-`zcsel` depends of [htmlparser](https://npmjs.org/package/htmlparser "htmlparser") or [htmlparser2](https://npmjs.org/package/htmlparser2 "htmlparser2") and [ent](https://npmjs.org/package/ent "ent").
+`zcsel` depends of [htmlparser](https://npmjs.org/package/htmlparser "htmlparser") or [htmlparser2](https://npmjs.org/package/htmlparser2 "htmlparser2") and [he](https://www.npmjs.com/package/he "he").
