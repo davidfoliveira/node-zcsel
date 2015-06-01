@@ -61,14 +61,33 @@ function test2(handler){
 			console.log("Problem searching for tag subject on tag:contains() selection. Expected to find 'ol' but found an '"+res.tag()+"' tag");
 			return handler(true,false);
 		}
-		console.log("Single tag: OK");
+		console.log("tag :subsel: OK");
+		return handler(false,true);
+	});
+}
+function test3(handler){
+	parse('<body><ul><li>1</li><li><ol><li>2.1</li><li>2.2</li></ol></li><li>3<ul><li>3.1</li></ul></li></ul></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $('!ol:first-child li:contains("2")');
+		if ( res.length != 1 ) {
+			console.log("Problem searching for tag subject:first-child on tag:contains() selection. Expected 1 nodes and got "+res.length);
+			return handler(true,false);
+		}
+		if ( res.tag() != 'ol' ) {
+			console.log("Problem searching for tag subject:first-child on tag:contains() selection. Expected to find 'ol' but found an '"+res.tag()+"' tag");
+			return handler(true,false);
+		}
+		console.log("Tag:subsel: OK");
 		return handler(false,true);
 	});
 }
 
 // Run the tests
 
-series([test1,test2],function(err,ran){
+series([test1,test2,test3],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

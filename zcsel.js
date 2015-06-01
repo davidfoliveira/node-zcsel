@@ -77,12 +77,11 @@ function _initDomNode(node,par,id) {
 
 }
 
-function select(dom,q) {
-
+function select(dom,q,inside) {
 	var
 		objs = (dom instanceof Array) ? dom : [dom],
 		match = true,
-		hadSpace = true,
+		hadSpace = (inside == null) ? true : !!inside,
 		newObjs,
 		keepSubject = false,
 		resultSet = [];
@@ -99,7 +98,7 @@ function select(dom,q) {
 	// While have expression
 	while ( match ) {
 		if ( keepSubject ) {
-			objs = _subj_select(objs,q);
+			objs = _subj_select(objs,q,hadSpace);
 			q = '';
 			break;
 		}
@@ -107,8 +106,10 @@ function select(dom,q) {
 		match = false;
 		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[((?:[\w\-]+\s*(?:[\|\*\~\$\!\^=]*=\s*\"[^"]*\")?\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attrsels,space,comma){
 			match = true;
-			if ( !keepSubject && subject )
+			if ( !keepSubject && subject ) {
 				keepSubject = true;
+				hadSpace = space != null;
+			}
 
 			var
 				queryFn = hadSpace ?
@@ -231,13 +232,13 @@ function select(dom,q) {
 
 }
 
-function _subj_select(objs,q) {
+function _subj_select(objs,q,hadSpace) {
 
 	var
 		newObjs = [];
 
 	objs.forEach(function(o){
-		var ores = select(o,q);
+		var ores = select(o,q,hadSpace);
 		if ( ores && ores.length > 0 )
 			newObjs.push(o);
 	});
