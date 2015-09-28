@@ -222,8 +222,25 @@ function test9(handler){
 	});	
 }
 
+function test10(handler){
+	var html = '<div><p>This\ntext\nhas some \\n instead\nof spaces.\n</p></div>';
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+
+		if($("div").html() !== "<p>This\ntext\nhas some \\n instead\nof spaces.\n</p>"){
+			console.log("Problem with html(). The final result is different from what was expected. Expecting a div.html()='<p>This\ntext\nhas some \\n instead\nof spaces.\n</p>' and got '"+$("div").html()+"'");
+			return handler(true,false);
+		}
+		console.log("html(): OK");
+		return handler(false,true);
+	});
+}
+
 // Run the tests
-series([test1,test2,test3,test4,test5,test6,test7,test8,test9],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
