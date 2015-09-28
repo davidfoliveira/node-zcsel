@@ -699,45 +699,50 @@ function _resOuterHTML() {
 
 }
 
-function _resHTML() {
+function _resHTML(opts) {
 
 	var
-		html = "";
+		html	= "",
+		_opts	= opts || {};
 
 	// For all elements
 	this.forEach(function(el){
 		if ( el.children && el.children.length ) {
 			el.children.forEach(function(c){
-				html += _elHTML(c);
+				html += _elHTML(c,_opts)+(_opts.pretty ? "\n" : "");
 			});
 		}
 	});
 
+	// Remove the last return
+	if ( _opts.pretty && html.length > 1 )
+		html = html.substr(0,html.length-1);
+
 	return html;
 
 }
-function _elHTML(el){
+function _elHTML(el,opts){
 
 	var
 		code = '';
 
 	if ( el.type == 'text' ) {
-		var str = (el.raw || '').replace(/[\r\n]+/g,"");
+		var str = (el.raw || ''); //.replace(/[\r\n]+/g,"");
 		if ( str )
-			code += he.decode(str)+"\n";
+			code += he.decode(str);
 	}
 	else if ( el.type == 'tag' ) {
 		if ( !el.name.match(/^\s*(br|img|col|command|input|embed|hr|link|param|source)\s*$/i) ) {
 			code += "<"+el.data+">";
 			if ( el.children && el.children.length > 0 ) {
 				el.children.forEach(function(c){
-					code += _elHTML(c);
+					code += _elHTML(c,opts);
 				});
 			}
-			code += "</"+el.name+">\n";
+			code += "</"+el.name+">";
 		}
 		else
-			code += "<"+el.data+">\n";
+			code += "<"+el.data+">";
 	}
 	else if ( el.type == 'comment' )
 		code += '<!--'+el.data+'-->';
