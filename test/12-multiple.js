@@ -104,10 +104,30 @@ function test5(handler){
 		return handler(false,true);
 	});
 }
+function test6(handler){
+	parse('<body><ul class="first"><li class=i>1</li><li class=i>2<ol class=o><li class=i>2.1</li><li class=i>2.2</li></ol></li><li class=i>3<ul class=u><li class=i>3.1</li></ul></li></ul></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $("ol > li, ul > li");
+		if ( res.length != 6 ) {
+			console.log("Problem checking for multiple selector results order. Expected 6 nodes and got "+res.length);
+			return handler(true,false);
+		}
+		if ( res[0].par.name != 'ul' || res[0].par.attribs['class'] != "first" ) {
+			console.log("Problem checking for multiple selector results order. Expecting to get '<ul class=first>' ang got '<"+res[0].par.data+">'");
+			return handler(true,false);
+		}
+
+		console.log("Elements order: OK");
+		return handler(false,true);
+	});
+}
 
 // Run the tests
 
-series([test1,test2,test3,test4,test5],function(err,ran){
+series([test1,test2,test3,test4,test5,test6],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

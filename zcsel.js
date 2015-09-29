@@ -228,7 +228,7 @@ function select(dom,q,inside) {
 		throw new Error("Can't understand selector "+JSON.stringify(q));
 
 	resultSet = resultSet.concat(objs);
-	return _resBless(_uniqueNodes(resultSet));
+	return _resBless(_sortNodes(_uniqueNodes(resultSet)));
 
 }
 
@@ -243,6 +243,14 @@ function _subj_select(objs,q,hadSpace) {
 			newObjs.push(o);
 	});
 	return newObjs;
+
+}
+
+function _sortNodes(nodes) {
+
+	return nodes.sort(function(a,b){
+		return (a._id < b._id) ? -1 : (a._id > b._id) ? 1 : 0;
+	});
 
 }
 
