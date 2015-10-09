@@ -1,7 +1,7 @@
 var
 	htmlparser	= require('htmlparser'),
 	he			= require('he'),
-	base64Digs	= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/";
+	base64XDigs	= "+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 function initDom(dom,par) {
 
@@ -65,16 +65,16 @@ function _initDomNode(node,par,id) {
 
 	// Initialize children
 	if ( node.children instanceof Array ) {
-		node._nextid = 1;
+		node._nextid = 0;
 		var
 			prev = null;
 
 		// How many children do we have ?
-		digits = _numberToBase64(node.children ? node.children.length : 0).length;
+		digits = _numberToBase64X(node.children ? node.children.length : 0).length;
 
 		// Initialize each node
 		node.children.forEach(function(c){
-			_initDomNode(c,node,node._id+"."+_numberToBase64(node._nextid++,digits));
+			_initDomNode(c,node,node._id+"."+_numberToBase64X(node._nextid++,digits));
 			if ( prev ) {
 				prev.nextSibling = c;
 				c.previousSibling = prev;
@@ -85,7 +85,7 @@ function _initDomNode(node,par,id) {
 
 }
 
-function _numberToBase64(number,length) {
+function _numberToBase64X(number,length) {
 
 	var
 		rixit,
@@ -98,7 +98,7 @@ function _numberToBase64(number,length) {
 
     while ( true ) {
         rixit = residual % 64
-        result = base64Digs.charAt(rixit) + result;
+        result = base64XDigs.charAt(rixit) + result;
         residual = Math.floor(residual / 64);
         if (residual == 0)
             break;
@@ -106,7 +106,7 @@ function _numberToBase64(number,length) {
 	// Fill up with zeros
 	if ( length != null ) {
 		for ( var x = result.toString().length; x < length ; x++ )
-			result = '0'+result;
+			result = base64XDigs[0]+result;
 	}
 
     return result;
