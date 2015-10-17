@@ -80,9 +80,13 @@ function test4(handler) {
 			return;
 		}
 
-		var res = $("<h1>Bla</h1><h2>Bli</h2>").find("h1,h2").length;
-		if ( res == 2 ) {
-			console.log("Error getting finding two built main nodes. Expected 2 nodes and got '"+res+"'");
+		var res = $("<h1>Bla</h1><h2>Bli</h2>").find("h1,h2");
+		if ( res.length != 2 ) {
+			console.log("Error finding two built main nodes. Expected 2 nodes and got '"+res.length+"'");
+			return handler(true,false);
+		}
+		if ( res[0].name != 'h1' ) {
+			console.log("Error finding two built main nodes. Expecting to have first <h1> and got <"+res[0].name+">");
 			return handler(true,false);
 		}
 		console.log("$('<h1></h1><h2></h2>').find(): OK");
@@ -180,9 +184,32 @@ function test10(handler){
 		return handler(false,true);
 	});	
 }
+function test11(handler){
+	var html = "<html><head></head><body><h1>Some title</h1><a href=\"#\">JS</a></body></html>";
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		if ( $("a").length != 1 ) {
+			console.log("Problem with element positions. Expecting to get 1 element and got "+$("a").length);
+			return handler(true,false);
+		}
+		if ( $("a")[0]._pos == null ) {
+			console.log("Problem with element position. The returned element has no position");
+			return handler(true,false);
+		}
+		if ( $("a")[0]._pos != 1 ) {
+			console.log("Problem with element position. The returned element has a wrong position. Expecting position 1 and it has "+$("a")[0]._pos);
+			return handler(true,false);
+		}
+		console.log("_pos: OK");
+		return handler(false,true);
+	});	
+}
 
 // Run the tests
-series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

@@ -1,7 +1,6 @@
 var
 	htmlparser	= require('htmlparser'),
-	he			= require('he'),
-	base64XDigs	= "+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	he			= require('he');
 
 function initDom(dom,par) {
 
@@ -32,15 +31,8 @@ function initDom(dom,par) {
 
 	// Methods
 	$.forEach	= function(cb){$.children.forEach(cb);};
-/*
-	$.find		= function(){return _resFind.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.build		= function(){return _resBuild.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.html		= function(){return _resHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.outerhtml	= function(){return _resOuterHTML.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.text		= function(){return _resText.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.code		= function(){return _resCode.apply(godNode,Array.prototype.slice.call(arguments,0))};
-	$.bless		= function(){return _resBless.apply(godNode,Array.prototype.slice.call(arguments,0))};
-*/
+
+	// Bless the $
 	_resBless($,true);
 
 	return $;
@@ -69,12 +61,10 @@ function _initDomNode(node,par,id) {
 		var
 			prev = null;
 
-		// How many children do we have ?
-		digits = _numberToBase64X(node.children ? node.children.length : 0).length;
-
 		// Initialize each node
 		node.children.forEach(function(c){
-			_initDomNode(c,node,node._id+"."+_numberToBase64X(node._nextid++,digits));
+			c._pos = node._nextid;
+			_initDomNode(c,node,node._id+"."+(node._nextid++));
 			if ( prev ) {
 				prev.nextSibling = c;
 				c.previousSibling = prev;
@@ -85,35 +75,22 @@ function _initDomNode(node,par,id) {
 
 }
 
-function _numberToBase64X(number,length) {
+function num(val,length) {
 
 	var
-		rixit,
-		residual,
-		result = '';
+		zeroes = "";
 
-	if ( isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY )
-		return null;
-	residual = Math.floor(number);
-
-    while ( true ) {
-        rixit = residual % 64
-        result = base64XDigs.charAt(rixit) + result;
-        residual = Math.floor(residual / 64);
-        if (residual == 0)
-            break;
-    }
-	// Fill up with zeros
 	if ( length != null ) {
-		for ( var x = result.toString().length; x < length ; x++ )
-			result = base64XDigs[0]+result;
+		for ( var x = length ; x > val.toString().length ; x-- )
+			zeroes += "0";
 	}
 
-    return result;
+	return zeroes+val;
 
 }
 
 function select(dom,q,inside) {
+
 	var
 		objs = (dom instanceof Array) ? dom : [dom],
 		match = true,
@@ -126,10 +103,11 @@ function select(dom,q,inside) {
 		initDom(dom,null);
 
 	// Query is a function? Cool!
-	if ( typeof q == "function" )
+	if ( typeof q == "function" ) {
 		return _resBless(_allChilds(objs,null,function(el){
 			return q(_resBless(el));
 		}));
+	}
 
 	// While have expression
 	while ( match ) {
@@ -148,7 +126,7 @@ function select(dom,q,inside) {
 			}
 
 			var
-				queryFn = hadSpace ?
+				queryFn = (dom._findOutside ? false : hadSpace) ?
 					(sibsel == ">") ? _childs :
 					(sibsel == "+") ? _adjSib :
 					(sibsel == "~") ? _genSibComb :
@@ -284,8 +262,24 @@ function _subj_select(objs,q,hadSpace) {
 
 function _sortNodes(nodes) {
 
+	var
+		paths = {};
+
+	// Build node paths
+	nodes.forEach(function(node){
+		var
+			n = node,
+			p = "/";
+		while ( n ) {
+			p = "/"+num(n._pos,n.par ? n.par.children.length.toString().length : null)+p;
+			n = n.par;
+		}
+		paths[node._id] = p;
+	});
+
+	// Sort returns by path
 	return nodes.sort(function(a,b){
-		return (a._id < b._id) ? -1 : (a._id > b._id) ? 1 : 0;
+		return (paths[a._id] > paths[b._id]) ? 1 : (paths[a._id] == paths[b._id]) ? 0 : -1;
 	});
 
 }
@@ -648,6 +642,9 @@ function _resBuild(htmlCode) {
 	});
 	_resBless(els);
 
+	// If there will be a find() on the returned object, it will also include searching on the main nodes
+	els._findOutside = true;
+
 	return els;
 }
 
@@ -797,23 +794,7 @@ function _elHTML(el,opts){
 
 function _resFind(q) {
 
-	var
-		elHash = { },
-		els = [ ];
-
-/*	this.forEach(function(el){
-		var
-			subels = select(el,q);
-
-		subels.forEach(function(sel){
-			if ( elHash[sel._id] != null )
-				return;
-
-			elHash[sel._id] = true;
-			els.push(sel);
-		});
-	});
-*/	return _resBless(select(this,q));
+	return _resBless(select(this,q,!this._findOutside));
 
 }
 
@@ -1076,6 +1057,7 @@ function _elementAdd(target,source,idx) {
 	if ( !target.children )
 		target.children = [];
 
+	// Add the new node depending of idx
 	if ( typeof idx != "number" )
 		idx = null;
 	if ( idx != null )
@@ -1094,9 +1076,11 @@ function _elementAdd(target,source,idx) {
 
 	// Source (and source children) should now have new id's, based on their parent id
 	if ( !target._nextid )
-		target._nextid = 1;
-	source.id = target._id+"."+(target._nextid++);
-	_initDomNode(source,target,source.id);
+		target._nextid = 0;
+
+	// Set and propagate the ID
+	source._id = target._id+"."+(target._nextid++);
+	_initDomNode(source,target,source._id);
 
 }
 
@@ -1116,15 +1100,18 @@ function _resReplaceWith(content) {
 	var
 		newElems = _argElements(args);
 
-	// Go on each parent of the elements of the set and locate for the nodes
+	// For each element in the set
 	set.forEach(function(el){
+
+		// Go on the parent of the element and replace it
 		var addedEls = _elementsReplace(el,newElems);
 
+		// Initialize as child of el.par
 		if ( !el._nextid )
-			el._nextid = 1;
+			el._nextid = 0;
 		addedEls.forEach(function(addedEl){
-			addedEl.id = el.id+"."+(el._nextid++);
-			_initDomNode(addedEl,el,addedEl.id);
+			addedEl._id = el.par._id+"."+(el.par._nextid++);
+			_initDomNode(addedEl,el,addedEl._id);
 		});
 	});
 
@@ -1148,9 +1135,11 @@ function _elementsReplace(el,addElements) {
 	if ( _addElements.length == 0 )
 		return [];
 
+	// Find the between his brothers
 	bros = el.par.children;
 	for ( var x = 0 ; x < bros.length ; x++ ) {
 		if ( bros[x]._id == el._id ) {
+
 			// Link elements between each other
 			for ( var le = 0 ; le < _addElements.length ; le++ ) {
 				if ( le > 0 ) {
@@ -1183,7 +1172,6 @@ function _elementsReplace(el,addElements) {
 	return _addElements;
 
 }
-
 
 // Self object
 exports.select			= select;
