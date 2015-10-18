@@ -255,7 +255,7 @@ function test13(handler){
 			console.log("Problem searching for Tag:contains(\"Text\"). Found the wrong element. Expected to find 'I have some text' and found '"+res.text()+"'");
 			return handler(true,false);
 		}
-		console.log("Tag:contains(\"Text\"): OK");
+		console.log("Tag:contains(\"text\"): OK");
 		return handler(false,true);
 	});
 }
@@ -319,11 +319,31 @@ function test16(handler){
 		return handler(false,true);
 	});
 }
+function test17(handler){
+	parse('<body><div><p>Text</p><p>I have some text</p><p>I don\'t have :"(</p></body>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var res = $('p:contains("text"):nth-of-type(2)');
+
+		if ( res.length != 1 ) {
+			console.log("Problem searching for Tag:contains(\"Text\"):last-of-type. Expected 1 node and got "+res.length);
+			return handler(true,false);
+		}
+		if ( res.text() != "I have some text" ) {
+			console.log("Problem searching for Tag:contains(\"Text\"):last-of-type. Found the wrong element. Expected to find 'I have some text' and found '"+res.text()+"'");
+			return handler(true,false);
+		}
+		console.log("Tag:contains(\"text\"):last-of-type: OK");
+		return handler(false,true);
+	});
+}
 
 
 // Run the tests
 
-series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14,test15,test16],function(err,ran){
+series([/*test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14,test15,test16,*/test17],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

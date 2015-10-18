@@ -1,6 +1,6 @@
-# zcsel: Zé CSS Selectors - A JQuery "kind of" CSS Selectors
+# zcsel: Zé CSS Selectors - A JQuery "kind of" CSS Selector engine
 
-`zcsel` is my DOM handler and query engine tool belt. It is based on [htmlparser](https://npmjs.org/package/htmlparser "htmlparser") and supports the most useful [JQuery/CSS3 selectors](http://api.jquery.com/category/selectors/ "selector list page"). This is not committed to any of the CSS[23] and JQuery specifications but.. it pretends to be as near as possible to the available specifications.
+`zcsel` is a CSS Selector engine and a DOM manipulation tool belt for Node.JS. It is based on [htmlparser](https://npmjs.org/package/htmlparser "htmlparser") and supports the most useful [JQuery/CSS3 selectors](http://api.jquery.com/category/selectors/ "selector list page"). This is not committed to any of the CSS[23] and JQuery specifications but.. it pretends to be as near as possible to the available specifications.
 
 The supported selectors are:
 
@@ -76,7 +76,7 @@ The supported methods are:
 - val(): The same as attr("value");
 - append(node1,node2,...): Add the specified nodes to the end of the matching elements;
 - remove(): Removes the matching elements from their parent elements;
-- empty(): Removes all the child nodes on the matching elements;
+- empty(): Removes all the child nodes from the matching elements;
 - replaceWith(node1,node2,...): Replace each one of the matching elements with the specified nodes;
 
 Parsing HTML:
