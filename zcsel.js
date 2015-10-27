@@ -2,19 +2,17 @@ var
 	htmlparser	= require('htmlparser'),
 	he			= require('he');
 
-function initDom(dom,par) {
+function initDom(dom) {
 
 	var
 		nodes = (dom instanceof Array) ? dom : [dom],
 		id = 1;
 
+	// Initialize each element
 	nodes.forEach(function(node){
+		node._pos = id;
 		_initDomNode(node,null,"R"+(id++));
 	});
-	nodes = _resBless(nodes);
-
-	// G0d node
-	var godNode = [{tag:'#G0D',name:'#G0D',type:'tag',_IAMGOD:true,children:nodes}];
 
 	// The d0llar
 	var $ = function(q){
@@ -27,10 +25,15 @@ function initDom(dom,par) {
 	};
 
 	// Self nodes
-	$.children = godNode;
+	$.children = nodes;
 
 	// Methods
 	$.forEach	= function(cb){$.children.forEach(cb);};
+
+	// Find outside
+	$.type		= '#G0D';
+	$.name		= "#G0D";
+	$._IAMGOD	= true;
 
 	// Bless the $
 	_resBless($,true);
@@ -44,11 +47,8 @@ function _initDomNode(node,par,id) {
 	var
 		digits;
 
-	if ( node._id != null )
-		return;
-
-	node.par = par;
 	node._id = (id ? id : 0).toString();
+	node.par = par;
 
 	if ( node.attribs ) {
 		if ( node.attribs['class'] && !node.classes )
@@ -99,7 +99,8 @@ function select(dom,q,inside) {
 		keepSubject = false,
 		resultSet = [];
 
-	if ( typeof(dom.par) == "undefined" )
+	// Not initialized?
+	if ( typeof(dom._id) == "undefined" )
 		initDom(dom,null);
 
 	// Query is a function? Cool!
@@ -271,6 +272,10 @@ function _sortNodes(nodes) {
 			n = node,
 			p = "/";
 		while ( n ) {
+//		while ( n && !n._IAMGOD ) {
+			if ( typeof n._pos == "undefined" ) {
+				console.log("Node has undefined _pos: ",_dump(n));
+			}
 			p = "/"+num(n._pos,n.par ? n.par.children.length.toString().length : null)+p;
 			n = n.par;
 		}
@@ -412,7 +417,7 @@ function _allChilds(dom,nodes,filter) {
 		dom.children.forEach(function(c){
 			if ( c.type != 'tag' && c.type != 'script' )
 				return;
-			if (!filter || filter(c) )
+			if ( !filter || filter(c) )
 				nodes.push(c);
 
 			return _allChilds(c,nodes,filter);
@@ -638,6 +643,7 @@ function _resBuild(htmlCode) {
 	// Initialize and bless them
 	var id = 0;
 	els.forEach(function(node){
+		node._pos = id;
 		_initDomNode(node,null,"R"+(++id));
 	});
 	_resBless(els);
@@ -745,6 +751,10 @@ function _resHTML(opts) {
 	var
 		html	= "",
 		_opts	= opts || {};
+
+	// God? Return outerhtml instead #HACK
+	if ( this._IAMGOD )
+		return _resOuterHTML.apply(this,opts);
 
 	// For all elements
 	this.forEach(function(el){
@@ -1079,6 +1089,7 @@ function _elementAdd(target,source,idx) {
 		target._nextid = 0;
 
 	// Set and propagate the ID
+	source._pos = target.children.length;
 	source._id = target._id+"."+(target._nextid++);
 	_initDomNode(source,target,source._id);
 
@@ -1097,6 +1108,7 @@ function _resReplaceWith(content) {
 			contentEl.remove();
 	});
 
+	// Make sure the input is a list of nodes
 	var
 		newElems = _argElements(args);
 
@@ -1109,9 +1121,10 @@ function _resReplaceWith(content) {
 		// Initialize as child of el.par
 		if ( !el._nextid )
 			el._nextid = 0;
-		addedEls.forEach(function(addedEl){
-			addedEl._id = el.par._id+"."+(el.par._nextid++);
+		newElems.forEach(function(addedEl){
+			var newID = el._id+"."+(el._nextid++);
 			_initDomNode(addedEl,el,addedEl._id);
+			addedEl._id = newID;
 		});
 	});
 
@@ -1128,20 +1141,22 @@ function _elementsReplace(el,addElements) {
 	if ( !el.par )
 		return [];
 
-	// Clone elements to add
+	// Clone elements to add (because we can replace multiple elements in multiple tree positions)
 	addElements.forEach(function(addEl){
 		_addElements.push(_clone(addEl));
 	});
 	if ( _addElements.length == 0 )
 		return [];
 
-	// Find the between his brothers
+	// Find him (el) between his brothers
 	bros = el.par.children;
 	for ( var x = 0 ; x < bros.length ; x++ ) {
 		if ( bros[x]._id == el._id ) {
+			var prevPos = (x > 0) ? bros[x-1]._pos : -1;
 
-			// Link elements between each other
+			// Link elements between each other and set their new position
 			for ( var le = 0 ; le < _addElements.length ; le++ ) {
+				_addElements[le]._pos = ++prevPos;
 				if ( le > 0 ) {
 					_addElements[le].previousSibling = _addElements[le-1];
 					_addElements[le-1].nextSibling = _addElements[le];
@@ -1151,6 +1166,7 @@ function _elementsReplace(el,addElements) {
 					_addElements[le+1].previousSibling = _addElements[le];
 				}
 			}
+
 			// Link elements with their new brothers
 			if ( x > 0 ) {
 				_addElements[0].previousSibling = bros[x-1];
@@ -1159,6 +1175,11 @@ function _elementsReplace(el,addElements) {
 			if ( bros.length > x+1 ) {
 				_addElements[_addElements.length-1].nextSibling = bros[x+1];
 				bros[x+1].previousSibling = _addElements[_addElements.length-1];
+			}
+
+			// Set next elements position
+			for ( var nEl = x + 1 ; nEl < bros.length ; nEl++ ) {
+				bros[nEl]._pos = ++prevPos;
 			}
 
 			// Add
@@ -1172,6 +1193,24 @@ function _elementsReplace(el,addElements) {
 	return _addElements;
 
 }
+
+// Dump a node
+function _dump(n) {
+
+	if ( typeof n == "function" ) {
+		var ar = [];
+		n.forEach(function(i){
+			ar.push(i);
+		});
+		return ar;
+	}
+	else if ( n instanceof Array ) {
+		return Array.prototype.slice.call(n);
+	}
+	return n;
+
+}
+
 
 // Self object
 exports.select			= select;
