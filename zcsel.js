@@ -99,8 +99,8 @@ function select(dom,q,inside) {
 		keepSubject = false,
 		resultSet = [];
 
-	// Not initialized?
-	if ( typeof(dom._id) == "undefined" )
+	// Not initialized? Initialize it!
+	if ( dom && dom[0] != null && typeof dom[0]._id == "undefined" )
 		initDom(dom,null);
 
 	// Query is a function? Cool!
@@ -804,7 +804,8 @@ function _elHTML(el,opts){
 
 function _resFind(q) {
 
-	return _resBless(select(this,q,!this._findOutside));
+//	return _resBless(select(this,q,!this._findOutside));
+	return select(this,q,!this._findOutside);
 
 }
 

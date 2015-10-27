@@ -27,6 +27,7 @@ function series(fns,handler){
 		return handler(false,false);
 };
 
+// Check elements order
 function test1(handler){
 	parse('<html><head></head><body><ul><li>01</li><li>02</li><li>03</li><li>04</li><li>05</li><li>06</li><li>07</li><li>08</li><li>09</li><li>10</li><li>11</li></ul></body></html>',function(err,$){
 		if ( err ) {
@@ -47,10 +48,32 @@ function test1(handler){
 	});	
 }
 
+// Check for re-initializations
+function test2(handler){
+	parse('<html><head></head><body><ul><li>01</li><li>02</li><li>03</li></ul></body></html>',function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		var ul = $('ul');
+		if ( ul.length != 1 ) {
+			console.log("Problem searching for re-initialized DOM parts. Couldn't find the UL element");
+			return handler(true,false);
+		}
+		var origID = ul[0]._id;
+		ul.find("li");
+		if ( ul[0]._id != origID ) {
+			console.log("Problem searching for re-initialized DOM parts: The element was re-initialized with a find(). ID was '"+origID+"' and now is '"+ul[0]._id+"'");
+			return handler(true,false);
+		}
+		console.log("Re-initializations: OK");
+		return handler(false,true);
+	});	
+}
 
 // Run the tests
 
-series([test1],function(err,ran){
+series([test1,test2],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);
