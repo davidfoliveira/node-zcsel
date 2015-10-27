@@ -50,8 +50,8 @@ function test2(handler) {
 		}
 
 		var dollarDollar = $($);
-		if ( typeof dollarDollar != "function" || !dollarDollar.children || dollarDollar.children.length < 0 || dollarDollar.children[0].name != '#G0D' ) {
-			console.log("Problem getting dollar of dollar. Expected #G0D and got a mortal");
+		if ( typeof dollarDollar != "function" || !dollarDollar._IAMGOD ) {
+			console.log("Problem getting dollar of dollar. Expected #G0D and got a mortal: ",dollarDollar);
 			return handler(true,false);
 		}
 		console.log("$($): OK");

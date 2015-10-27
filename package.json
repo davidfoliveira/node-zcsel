@@ -1,8 +1,8 @@
 {
   "author": "David Oliveira <d.oliveira@prozone.org>",
   "name": "zcsel",
-  "description": "Zé CSS Selectors - A JQuery "kind of" library for querying and manipulating DOM in node.js",
-  "version": "0.2.17",
+  "description": "Zé CSS Selectors - A JQuery \"kind of\" library for querying and manipulating DOM in node.js",
+  "version": "0.2.18",
   "repository": {
     "type": "git",
     "url": "https://github.com/davidfoliveira/node-zcsel"
