@@ -272,9 +272,9 @@ function _sortNodes(nodes) {
 			n = node,
 			p = "/";
 		while ( n ) {
-//		while ( n && !n._IAMGOD ) {
 			if ( typeof n._pos == "undefined" ) {
-				console.log("Node has undefined _pos: ",_dump(n));
+				console.log("Node has undefined _pos:");
+				_dump(n);
 			}
 			p = "/"+num(n._pos,n.par ? n.par.children.length.toString().length : null)+p;
 			n = n.par;
@@ -1122,10 +1122,10 @@ function _resReplaceWith(content) {
 		// Initialize as child of el.par
 		if ( !el._nextid )
 			el._nextid = 0;
-		newElems.forEach(function(addedEl){
+		addedEls.forEach(function(addedEl){
 			var newID = el._id+"."+(el._nextid++);
-			_initDomNode(addedEl,el,addedEl._id);
 			addedEl._id = newID;
+			_initDomNode(addedEl,el.par,addedEl._id);
 		});
 	});
 
@@ -1187,7 +1187,7 @@ function _elementsReplace(el,addElements) {
 			_addElements.splice(0,0,x,1);
 			bros.splice.apply(bros,_addElements);
 
-			return _addElements.splice(2,bros.length-2);
+			return _addElements.splice(2,_addElements.length-2);
 		}
 	}
 
@@ -1203,10 +1203,36 @@ function _dump(n) {
 		n.forEach(function(i){
 			ar.push(i);
 		});
-		return ar;
+		return _dumpNode(ar);
 	}
 	else if ( n instanceof Array ) {
-		return Array.prototype.slice.call(n);
+		var ar = Array.prototype.slice.call(n);
+		return _dumpNode(ar);
+	}
+	return _dumpNode(n);
+
+}
+
+function _dumpNode(n) {
+
+	if ( n instanceof Array ) {
+		var subnodes = [];
+		n.forEach(function(sn){
+			subnodes.push(_dumpNode(sn));
+		});
+		return subnodes;
+	}
+	else if ( n._id ) {
+		var newNode = _clone(n);
+		if ( newNode.par )
+			newNode.par = newNode.par._id;
+		if ( newNode.nextSibling )
+			newNode.nextSibling = newNode.nextSibling._id;
+		if ( newNode.previousSibling )
+			newNode.previousSibling = newNode.previousSibling._id;
+		if ( newNode.children )
+			newNode.children = _dumpNode(newNode.children);
+		return newNode;
 	}
 	return n;
 
