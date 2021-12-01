@@ -78,6 +78,8 @@ The supported methods are:
 - remove(): Removes the matching elements from their parent elements;
 - empty(): Removes all the child nodes from the matching elements;
 - replaceWith(node1,node2,...): Replace each one of the matching elements with the specified nodes;
+- hasClass(class): Determine whether any of the matched elements are assigned the given class;
+
 
 Parsing HTML:
 

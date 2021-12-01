@@ -207,9 +207,36 @@ function test11(handler){
 		return handler(false,true);
 	});	
 }
+function test12(handler) {
+	var html = "<html><head></head><body><h1>Some title</h1><a class=\"x yd z\">JS</a><a class=\"meh moh\">PL</a></body></html>";
+	parse(html,function(err,$){
+		if ( err ) {
+			console.log("Error parsing HTML: ",err);
+			return;
+		}
+		if ( !$("a").hasClass("yd") ) {
+			console.log("Problem with hasClass(). Can't find elements with the 'xd' class");
+			return handler(true,false);
+		}
+		if ( $("a").hasClass("not-here") ) {
+			console.log("Problem with hasClass(). Found elements with the 'not-here' class");
+			return handler(true,false);
+		}
+		if ( !$("a").hasClass("x") ) {
+			console.log("Problem with hasClass(). Can't find elements with the 'x' class");
+			return handler(true,false);
+		}
+		if ( !$("a").hasClass("x") ) {
+			console.log("Problem with hasClass(). Can't find elements with the 'z' class");
+			return handler(true,false);
+		}
+
+		console.log("hasClass(): OK");
+	});
+}
 
 // Run the tests
-series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11],function(err,ran){
+series([test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12],function(err,ran){
 	if ( err ) {
 		console.log("Some tests failed");
 		return process.exit(-1);

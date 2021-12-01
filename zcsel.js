@@ -594,6 +594,9 @@ function _resBless(objs) {
 	objs.removeAttr		= _resRemoveAttr;
 	objs.tag			= _resTag;
 
+	// Node information methods
+	objs.hasClass		= _resHasClass;
+
 	// Querying and walking
 	objs.find			= _resFind;
 	objs.get			= _resGet;
@@ -619,7 +622,7 @@ function _resBless(objs) {
 	objs.replaceWith	= _resReplaceWith;
 //	objs.replaceAll		= _resReplaceAll;	(os targets são passados como argumento e os sources sao o set)
 	objs.build			= _resBuild;
-	objs.val			= function(){return this.attr("value")};
+	objs.val			= function(){ return this.attr("value") };
 	objs._zcrset		= true;
 
 	return objs;
@@ -876,6 +879,23 @@ function _resTag(newTagName) {
 
 	return (this[0] && this[0].name) ? this[0].name.toLowerCase() : null;
 
+}
+
+function _resHasClass(className) {
+
+	// Normalise class name
+	className = className.toLowerCase();
+
+	// For all elements
+	for (var x = 0; x < this.length; x++) {
+		var el = this[x];
+		if (el.classes instanceof Array) {
+			for (var y = 0; y < el.classes.length; y++)
+				if (el.classes[y] == className) return true;
+		}
+	}
+
+	return false;
 }
 
 function _resEach(fn) {
