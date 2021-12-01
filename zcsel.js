@@ -110,7 +110,7 @@ function select(dom,q,inside) {
 		}));
 	}
 
-	// While have expression
+	// While it has an expression
 	while ( match ) {
 		if ( keepSubject ) {
 			objs = _subj_select(objs,q,hadSpace);
@@ -119,7 +119,7 @@ function select(dom,q,inside) {
 		}
 
 		match = false;
-		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)")\))?|\[((?:[\w\-]+\s*(?:[\|\*\~\$\!\^=]*=\s*\"[^"]*\")?\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,attrsels,space,comma){
+		q = q.replace(/^\s*([>+~]*)\s*(\!?)(\*|([\.\#]?)([\w\-]+)|\:([\w\-]+)(?:\((?:(\d+)|"([^"]*)"|\/([^"]*)\/)\))?|\[((?:[\w\-]+\s*(?:[\|\*\~\$\!\^=]*=\s*\"[^"]*\")?\s*)+)\])(\s*)(\,?)/,function(a,sibsel,subject,rule,sign,name,subsel,subselNum,subselStr,subselRx, attrsels,space,comma){
 			match = true;
 			if ( !keepSubject && subject ) {
 				keepSubject = true;
@@ -186,7 +186,7 @@ function select(dom,q,inside) {
 				}
 				else {
 					newObjs = queryFn(objs,null,function(el){
-						return _subSelMatch(el,subsel.toLowerCase(),subselNum,subselStr);
+						return _subSelMatch(el,subsel.toLowerCase(),subselNum,subselStr,subselRx);
 					});
 				}
 			}
@@ -457,7 +457,7 @@ function _found(value,list) {
 
 }
 
-function _subSelMatch(el,sel,num,str) {
+function _subSelMatch(el,sel,num,str,rxStr) {
 
 	if ( num != null )
 		num = parseInt(num);
@@ -565,7 +565,8 @@ function _subSelMatch(el,sel,num,str) {
 			return (!el.children || el.children.length == 0);
 
 		case "contains":
-			return _elText(el,true).indexOf(str) > -1;
+			var text = _elText(el,true);
+			return rxStr ? text.match(new RegExp(rxStr)) : (text.indexOf(str) > -1);
 
 		default:
 			throw new Error("Unknown subselector :"+sel);

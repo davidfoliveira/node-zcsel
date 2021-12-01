@@ -25,7 +25,7 @@ The supported selectors are:
 - `:only-child`: Only Child Selector - Selects all elements that are the only child of their parent;
 - `:only-of-type`: Only Child of Type Selector - Selects all elements that have no siblings with the same element name;
 - `:eq(N)`: Index N Selector - Select the element at index n within the matched set;
-- `:contains("text")`: - Selects the elements containing the specified text on their inner text;
+- `:contains("text")` or `:contains(/basic-regex/)`: - Selects the elements containing the specified text or on their inner text or matching the provided regular expression;
 - `:first`: Last Element Selector - Selects the first matched element;
 - `:last`: Last Element Selector - Selects the last matched element;
 - `[attr]`: Attribute Selector - Selects elements that have the specified attribute, regardless of its value;
